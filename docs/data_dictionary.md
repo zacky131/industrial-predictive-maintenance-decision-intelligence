@@ -54,11 +54,11 @@ There is no binary failure target, so positive prevalence is not applicable unti
 
 One future prediction represents the estimated remaining operational cycles for **one engine at one current cycle**, using only information observed through that cycle. The maintenance decision applies to that engine before the next feasible intervention window.
 
-The later economic decision quantity will be `P(RUL <= H)`. The dataset does not define how operational cycles map to the fictional manufacturer's calendar or maintenance windows, so `H` remains unresolved and must not be inferred from the data alone.
+The later economic decision quantity will be `P(RUL <= H)`. The dataset does not define how operational cycles map to the fictional manufacturer's calendar or maintenance windows, so the business value of `H` remains unresolved and must not be inferred from the data alone. Day 16 uses `H = 30 cycles` solely as a transparent baseline-experiment assumption; it is not an approved maintenance window.
 
 ## 5. Feature Dictionary
 
-Observed data types refer to the local FD001 training file. NASA's supplied documentation describes three operating settings and sensor measurements but does not provide physical names or units for those channels.
+Observed data types refer to the local FD001 training file. Sensor names and units follow Table 2 of the primary paper included in the NASA archive, *Damage Propagation Modeling for Aircraft Engine Run-to-Failure Simulation*. The mapping assumes the dataset's 21 numbered sensor columns preserve the published Table 2 order.
 
 | Column | Meaning | Data Type | Unit | Role | Available at Prediction Time? | Leakage Risk | Decision | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -67,27 +67,27 @@ Observed data types refer to the local FD001 training file. NASA's supplied docu
 | `operational_setting_1` | Anonymized operating-condition setting 1 | Float | Not documented | Feature | Yes | Low | KEEP | 158 observed values; negative values appear to be encoded settings, not confirmed physical negatives |
 | `operational_setting_2` | Anonymized operating-condition setting 2 | Float | Not documented | Feature | Yes | Low | KEEP | 13 observed values; five test rows are slightly above the training maximum |
 | `operational_setting_3` | Anonymized operating-condition setting 3 | Float | Not documented | Feature | Yes | Low | REMOVE | Constant at 100 in FD001 |
-| `sensor_1` | Anonymized sensor measurement 1 | Float | Not documented | Feature | Yes | Low | REMOVE | Constant at 518.67 |
-| `sensor_2` | Anonymized sensor measurement 2 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable; two test values fall slightly below the training range |
-| `sensor_3` | Anonymized sensor measurement 3 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable; three test values fall slightly below the training range |
-| `sensor_4` | Anonymized sensor measurement 4 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable in the observed data |
-| `sensor_5` | Anonymized sensor measurement 5 | Float | Not documented | Feature | Yes | Low | REMOVE | Constant at 14.62 |
-| `sensor_6` | Anonymized sensor measurement 6 | Float | Not documented | Feature | Yes | Low | REMOVE | Only two values; 21.61 accounts for 98.03% of training rows |
-| `sensor_7` | Anonymized sensor measurement 7 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable in the observed data |
-| `sensor_8` | Anonymized sensor measurement 8 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable; one test value falls slightly below the training range |
-| `sensor_9` | Anonymized sensor measurement 9 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable in the observed data |
-| `sensor_10` | Anonymized sensor measurement 10 | Float | Not documented | Feature | Yes | Low | REMOVE | Constant at 1.30 |
-| `sensor_11` | Anonymized sensor measurement 11 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable; two test values fall slightly below the training range |
-| `sensor_12` | Anonymized sensor measurement 12 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable; three test values exceed the training range |
-| `sensor_13` | Anonymized sensor measurement 13 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable in the observed data |
-| `sensor_14` | Anonymized sensor measurement 14 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable in the observed data |
-| `sensor_15` | Anonymized sensor measurement 15 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable in the observed data |
-| `sensor_16` | Anonymized sensor measurement 16 | Float | Not documented | Feature | Yes | Low | REMOVE | Constant at 0.03 |
-| `sensor_17` | Anonymized sensor measurement 17 | Integer | Not documented | Feature | Yes | Low | INVESTIGATE | Variable with 13 observed values |
-| `sensor_18` | Anonymized sensor measurement 18 | Integer | Not documented | Feature | Yes | Low | REMOVE | Constant at 2,388 |
-| `sensor_19` | Anonymized sensor measurement 19 | Float | Not documented | Feature | Yes | Low | REMOVE | Constant at 100 |
-| `sensor_20` | Anonymized sensor measurement 20 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable in the observed data |
-| `sensor_21` | Anonymized sensor measurement 21 | Float | Not documented | Feature | Yes | Low | INVESTIGATE | Variable; two test values exceed the training range |
+| `sensor_1` | T2: total temperature at fan inlet | Float | °R | Feature | Yes | Low | REMOVE | Constant at 518.67 |
+| `sensor_2` | T24: total temperature at LPC outlet | Float | °R | Feature | Yes | Low | KEEP | Variable; two test values fall slightly below the training range |
+| `sensor_3` | T30: total temperature at HPC outlet | Float | °R | Feature | Yes | Low | KEEP | Variable; three test values fall slightly below the training range |
+| `sensor_4` | T50: total temperature at LPT outlet | Float | °R | Feature | Yes | Low | KEEP | Variable in the observed data |
+| `sensor_5` | P2: pressure at fan inlet | Float | psia | Feature | Yes | Low | REMOVE | Constant at 14.62 |
+| `sensor_6` | P15: total pressure in bypass duct | Float | psia | Feature | Yes | Low | REMOVE | Only two values; 21.61 accounts for 98.03% of training rows |
+| `sensor_7` | P30: total pressure at HPC outlet | Float | psia | Feature | Yes | Low | KEEP | Variable in the observed data |
+| `sensor_8` | Nf: physical fan speed | Float | rpm | Feature | Yes | Low | KEEP | Variable; one test value falls slightly below the training range |
+| `sensor_9` | Nc: physical core speed | Float | rpm | Feature | Yes | Low | KEEP | Variable in the observed data |
+| `sensor_10` | epr: engine pressure ratio (P50/P2) | Float | Dimensionless | Feature | Yes | Low | REMOVE | Constant at 1.30 |
+| `sensor_11` | Ps30: static pressure at HPC outlet | Float | psia | Feature | Yes | Low | KEEP | Variable; two test values fall slightly below the training range |
+| `sensor_12` | phi: ratio of fuel flow to Ps30 | Float | pps/psi | Feature | Yes | Low | KEEP | Variable; three test values exceed the training range |
+| `sensor_13` | NRf: corrected fan speed | Float | rpm | Feature | Yes | Low | KEEP | Variable in the observed data |
+| `sensor_14` | NRc: corrected core speed | Float | rpm | Feature | Yes | Low | KEEP | Variable in the observed data |
+| `sensor_15` | BPR: bypass ratio | Float | Dimensionless | Feature | Yes | Low | KEEP | Variable in the observed data |
+| `sensor_16` | farB: burner fuel-air ratio | Float | Dimensionless | Feature | Yes | Low | REMOVE | Constant at 0.03 |
+| `sensor_17` | htBleed: bleed enthalpy | Integer | Not stated | Feature | Yes | Low | KEEP | Variable with 13 observed values |
+| `sensor_18` | Nf_dmd: demanded fan speed | Integer | rpm | Feature | Yes | Low | REMOVE | Constant at 2,388 |
+| `sensor_19` | PCNfR_dmd: demanded corrected fan speed | Float | rpm | Feature | Yes | Low | REMOVE | Constant at 100 |
+| `sensor_20` | W31: HPT coolant bleed | Float | lbm/s | Feature | Yes | Low | KEEP | Variable in the observed data |
+| `sensor_21` | W32: LPT coolant bleed | Float | lbm/s | Feature | Yes | Low | KEEP | Variable; two test values exceed the training range |
 | `rul` | Cycles remaining until failure | Integer (derived) | Cycles | Target | No | High if used as input | TARGET | Derived from the last cycle of each training trajectory; never a predictor |
 | `rul_at_last_observation` | Official RUL at each test engine's endpoint | Integer | Cycles | Target | No | High if used as input | TARGET | Stored separately in `RUL_FD001.txt`; evaluation target only |
 | `T_failure` / per-unit maximum cycle | Final failure cycle used to derive training RUL | Integer (derived) | Cycles | Post-outcome | No | High | REMOVE | Known only after failure and must never enter a predictive feature set |
@@ -112,11 +112,11 @@ RUL, final cycle, future sensor observations, full-trajectory statistics, center
 
 ## 8. Fields Requiring Verification
 
-- Physical meanings and engineering units for all 21 anonymized sensor channels.
+- Confirm that the numbered dataset columns map exactly to the 21 Table 2 outputs in published order; the archive README does not repeat the names.
 - Units and exact semantics of the three operational settings.
 - The authoritative row-to-engine mapping for `RUL_FD001.txt`; local counts align one-to-one with 100 test engines, but the supplied `readme.txt` does not explicitly state the ordering rule.
 - An authoritative published checksum for `CMAPSSData.zip`, if one exists.
-- The business-defined horizon `H` and how C-MAPSS cycles relate to an actionable maintenance window.
+- The business-defined horizon `H` and how C-MAPSS cycles relate to an actionable maintenance window; Day 16's provisional 30-cycle label does not resolve this question.
 - Whether `sensor_6` should be excluded categorically or retained for compatibility with a documented benchmark protocol; its observed information content is negligible in FD001.
 
 ## 9. Notes for Future Modeling
@@ -124,6 +124,6 @@ RUL, final cycle, future sensor observations, full-trajectory statistics, center
 - Modeling readiness is **CONDITIONALLY READY**.
 - Freeze engine-disjoint development splits before fitting transformations or constructing windows.
 - Exclude `unit_number`, all constant fields, near-constant `sensor_6`, and every target/post-outcome construct from predictors.
-- Treat the remaining anonymized sensors as provisional until their source semantics and expected ranges are documented as far as the benchmark permits.
+- Use the variable sensor channels with their Table 2 meanings, while documenting that their observed ranges remain benchmark-specific simulation outputs.
 - Preserve the official test collection for one final assessment; do not use its RUL vector for tuning.
-- Define `H` before creating a binary failure-within-window target or connecting results to the economic threshold.
+- Confirm a business-defined `H` before interpreting the provisional Day 16 binary target operationally or connecting its probabilities to the economic threshold.

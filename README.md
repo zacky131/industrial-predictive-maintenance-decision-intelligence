@@ -10,4 +10,4 @@ Unplanned machine failures disrupt production, trigger emergency maintenance, an
 
 ## Current Status
 
-Day 9 — Data intake, quality audit, and modeling-readiness assessment completed.
+Day 16 — Leakage-safe baseline modeling completed; simple and nonlinear baselines compared.
